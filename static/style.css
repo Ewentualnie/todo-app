@@ -26,6 +26,7 @@ button {
     appearance: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    align-content: flex-end;
 }
 
 body {
@@ -64,9 +65,11 @@ main {
     padding-top: 30px;
     justify-content: center;
 }
-
+.task_content{
+    width: 400px;
+}
 .taskCompleted .task_content {
-    color: #27ae60;
+    color: #83e5fa;
     text-decoration: line-through;
 }
 
@@ -119,30 +122,6 @@ button {
     transition: background .1s, color .1s;
 }
 
-.settings {
-    margin: 20px 0;
-}
-
-.settings label {
-    margin: 5px 0;
-    display: block;
-}
-
-.settings input {
-    width: 300px;
-}
-
-.settings button {
-    background: white;
-    margin: 2px;
-    padding: 2px 5px;
-    box-shadow: 0 2px 4px 0 rgb(0 0 0 / 20%), 0 25px 50px 0 rgb(0 0 0 / 10%);
-}
-
-.settings button.selected {
-    background: #27ae60;
-    color: white;
-}
 
 /*border in selected field*/
 :focus {
@@ -194,7 +173,16 @@ button {
     align-items: center;
 }
 
-.LoginButton button, .logout, .new_todo_button {
+#settings {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.settings {
+    font-size: 16px;
+}
+.LoginButton button, .logout, .new_todo_button, .settings button, #back {
     background: radial-gradient(60.25% 122.24% at 103.28% -41.67%, #FDC2B0 0%, rgba(235, 81, 158, 0.25) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
     radial-gradient(80.74% 163.82% at -1.23% -17.59%, #5AF8FE 0%, rgba(235, 81, 158, 0.25) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
     radial-gradient(49.18% 100.93% at 77.87% 111.11%, rgba(137, 59, 254, 0.85) 0%, rgba(128, 187, 219, 0.2125) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */, #4EDFFC;
@@ -207,6 +195,21 @@ button {
     height: 45px;
     border-radius: 10px;
     margin-bottom: 15px;
+}
+#main {
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 398px;
+}
+.settings button {
+    width: 40px;
+}
+
+.settings button.selected {
+    background-color: rgba(0, 0, 0, 0.99);
+    color: wheat;
 }
 
 .new_todo_button {
@@ -234,7 +237,7 @@ hr {
     color: wheat;
     display: block;
     text-align: center;
-    margin:20px  auto auto auto ;
+    margin: 20px auto auto auto;
     font-size: 60px;
     font-weight: bold;
     box-shadow: 0 0 100px 1px rgba(245, 222, 179, 0.5);
