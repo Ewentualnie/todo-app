@@ -1,6 +1,3 @@
-this.tasks = [];
-
-
 let templates = {
     login: () =>
         '<h1>Account access</h1>\n' +
@@ -17,39 +14,23 @@ let templates = {
         '<button id="reg" onclick="registration()">Registration</button>\n' +
         '<button id="log" onclick="login()">Sign in</button>\n' +
         '</div>\n' +
-        '<div>\n' +
-        '<button id="set" onclick="loadSettings()">Settings</button>\n' +
-        '</div>\n' +
+        '<button id="set" onclick="settingsPage()">Settings</button>\n' +
         '</div>',
     settings: () =>
         '<h3>Application settings:</h3>\n' +
         '<div class="settings">\n' +
         'Version api:\n' +
-        '<button id="v1" onclick="setApiVersion()">v1</button>\n' +
-        '<button id="v2" onclick="setApiVersion()">v2</button>\n' +
+        '<button id="v1" onclick="setApiVersion(this)">v1</button>\n' +
+        '<button id="v2" onclick="setApiVersion(this)">v2</button>\n' +
         '</div>\n' +
-        '<button id="back" onclick="back()">Back</button>'
-    ,
+        '<button id="back" onclick="getTasks()">Back</button>',
     main: () =>
         '<h3>Add a new task:</h3>\n' +
         '<label style="display: flex;">\n' +
-        '<input class="new_todo" autofocus autocomplete="on" placeholder="walk the neighbor\'s cat" type="text">\n' +
-        '<span><button class="button new_todo_button">Add</button></span>\n' +
+        '<input onkeyup="enterCheck()" class="new_todo" autofocus autocomplete="on" placeholder="walk the neighbor\'s cat" type="text">\n' +
+        '<span><button  onclick="addTask()" class="button new_todo_button">Add</button></span>\n' +
         '</label>\n' +
-        `<h3 class="status_title">Active tasks: ${this.tasks.length}</h3>\n`,
-    task: () =>
-        '<div className="task taskCompleted">\n' +
-        '<div className="contentText">\n' +
-        '<div>\n' +
-        '<button className="task_done taskButton"><span style="color: rgb(39, 174, 96);"> ☑ </span></button>\n' +
-        '<span className="task_content"> text</span>\n' +
-        '</div>\n' +
-        '<div className="button check">\n' +
-        '<button style="color: rgb(236, 168, 26);"> ✎️</button>\n' +
-        '<button style="color: rgb(205, 21, 55);"> ✕</button>\n' +
-        '</div>\n' +
-        '</div>\n' +
-        '</div>'
+        `<h3 class="status_title">Active tasks: ${this.tasks.length}</h3>\n`
 }
 
 const wrapper = document.getElementById('wrapper')
@@ -57,39 +38,11 @@ const apiURL = 'http://localhost:3005/api/'
 let apiVersion = 'v1'
 
 
-let start = () => {
-    wrapper.childNodes.forEach(value => value.remove())
-    wrapper.appendChild(createLoginDiv())
-    console.log('log create')
-}
-
-function loadSettings() {
-    const log = document.getElementById('login')
-    wrapper.removeChild(log)
-    wrapper.appendChild(createSettingsDiv())
-    apiVersion === 'v1' ?
-        document.getElementById('v1').classList.add('selected') :
-        document.getElementById('v2').classList.add('selected');
-}
-
-function back() {
-    const settings = document.getElementById("settings")
-    wrapper.removeChild(settings)
-    wrapper.appendChild(createLoginDiv())
-}
-
-function setApiVersion() {
-    const v1 = document.getElementById('v1')
-    const v2 = document.getElementById('v2')
-    if (!v1.classList.contains('selected')) {
-        v1.classList.add('selected')
-        v2.classList.remove('selected')
-        apiVersion = 'v1'
-    } else {
-        v1.classList.remove('selected')
-        v2.classList.add('selected')
-        apiVersion = 'v2'
-    }
+function setApiVersion(button) {
+    const another = document.getElementById(button.innerText === 'v1' ? 'v2' : 'v1')
+    button.classList.add('selected')
+    another.classList.remove('selected')
+    apiVersion = button.innerText
 }
 
 function registration() {
@@ -158,7 +111,7 @@ function logout() {
         .then((response) => {
             if (response.ok) {
                 localStorage.clear();
-                start();
+                getTasks()
             }
         });
 }
@@ -172,66 +125,63 @@ function getTasks() {
     }).then(res => res.json())
         .then((response) => {
             if (response.error === 'forbidden') {
-                this.step = 'login';
+                loginPage()
             } else {
-                this.tasks = response.items.map((item) => {
-                    item.editable = false;
-                    return item;
-                })
-                let login = document.getElementById('login')
-                wrapper.removeChild(login)
-                wrapper.appendChild(createMainDiv())
-                allTasks()
-                addBottom()
-
-                this.step = 'items';
+                this.tasks = response.items
+                mainPage()
             }
         }).catch((error) => {
         this.step = 'error';
     })
-
 }
 
-
-function allTasks() {
-    const main = document.getElementById('main')
-    for (let i = 0; i < this.tasks.length; i++) {
-        main.appendChild(createTaskDiv(i + 1, this.tasks[i]))
-    }
+function updateTask(index, id) {
+    let request = JSON.stringify({
+        id: id,
+        text: this.tasks[index].text,
+        checked: this.tasks[index].checked
+    });
+    const route = apiVersion === 'v1' ? '/items' : '/router';
+    const qs = {action: apiVersion === 'v1' ? '' : 'editItem'};
+    fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
+        method: apiVersion === 'v1' ? 'PUT' : 'POST',
+        body: request,
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(res => res.json())
+        .then(() => {
+            this.getTasks()
+        });
 }
 
-function addBottom() {
-    const main = document.getElementById('main')
-    const hr = document.createElement('hr')
-    const button = document.createElement('button')
-    button.onclick = () => logout()
-    button.className = 'logout'
-    button.innerText = 'Log out'
-    main.append(hr, button)
-}
-
-function createChild(id, className, child) {
+function createChild(id, child) {
     const node = document.createElement("div")
     node.id = id
-    node.className = className
+    node.className = id
     node.innerHTML = child
     return node
 }
 
-let createLoginDiv = () => createChild('login', 'login', templates.login())
+let createLoginDiv = () => createChild('login', templates.login())
 
-let createSettingsDiv = () => createChild('settings', 'settings', templates.settings())
+let createSettingsDiv = () => createChild('settings', templates.settings())
 
-let createMainDiv = () => createChild('main', 'main', templates.main())
+let createMainDiv = () => createChild('main', templates.main())
 
 let createTaskDiv = (index, task) => {
-    const mainDiv = document.createElement('div')
-    mainDiv.append(createCheckedButton(task), createTextField(index, task), createEditDeleteButtons())
-    task.checked ? mainDiv.classList.add('task', 'taskCompleted') : mainDiv.classList.add('task');
-    return mainDiv
+    const taskDiv = document.createElement('div')
+    taskDiv.append(
+        createCheckedButton(index, task),
+        createTextField(index, task),
+        createEditDeleteButtons(index, task))
+    task.checked ? taskDiv.classList.add('task', 'taskCompleted') : taskDiv.classList.add('task');
+    return taskDiv
 }
 
-function createCheckedButton(task) {
+function createCheckedButton(index, task) {
     const button = document.createElement('button')
     const buttonSpan = document.createElement('span')
 
@@ -240,21 +190,24 @@ function createCheckedButton(task) {
     buttonSpan.style.color = !task.checked ? 'rgba(255, 255, 255, 0.8)' : '#83e5fa'
     buttonSpan.innerText = !task.checked ? '☐' : '☑';
 
+    button.onclick = () => markTask(index, task)
     button.appendChild(buttonSpan)
 
     return button
 }
 
-function createEditDeleteButtons() {
+function createEditDeleteButtons(index, task) {
     const buttons = document.createElement('div')
     const deleteButton = document.createElement('button')
     const editButton = document.createElement('button')
 
     editButton.innerText = '✎️'
     editButton.style.color = '#eca81a'
+    editButton.onclick = () => editTask(index, task)
 
     deleteButton.innerText = '✕'
     deleteButton.style.color = '#cd1537'
+    deleteButton.onclick = () => deleteTask(index, task)
 
     buttons.classList.add('button', 'check')
     buttons.append(editButton, deleteButton)
@@ -266,7 +219,84 @@ function createTextField(index, task) {
     const taskText = document.createElement('span')
 
     taskText.classList.add('task_content')
-    taskText.innerText = `${index}. ${task.text}`
+    taskText.innerText = `${index + 1}. ${task.text}`
 
     return taskText
+}
+
+function createLogoutButton() {
+    const button = document.createElement('button')
+    button.onclick = () => logout()
+    button.className = 'logout'
+    button.innerText = 'Log out'
+    return button
+}
+
+function createSettingsButton() {
+    const button = document.createElement('button')
+    button.id = 'set'
+    button.onclick = () => settingsPage()
+    button.innerText = 'Settings'
+    return button
+}
+
+function loginPage() {
+    wrapper.childNodes.forEach(value => value.remove())
+    wrapper.appendChild(createLoginDiv())
+}
+
+function mainPage() {
+    wrapper.childNodes.forEach(value => value.remove())
+    const main = createMainDiv()
+    this.tasks.forEach((value, index) => main.appendChild(createTaskDiv(index, value)))
+    const hr = document.createElement('hr')
+    main.append(hr, createLogoutButton(), createSettingsButton())
+    wrapper.appendChild(main)
+}
+
+function settingsPage() {
+    wrapper.childNodes.forEach(value => value.remove())
+    wrapper.appendChild(createSettingsDiv())
+    apiVersion === 'v1' ?
+        document.getElementById('v1').classList.add('selected') :
+        document.getElementById('v2').classList.add('selected');
+}
+
+function markTask(index, task) {
+    task.checked = !task.checked
+    updateTask(index, task.id)
+}
+
+function editTask(index, task) {
+
+}
+
+function deleteTask(index, task) {
+    let request = JSON.stringify({id: task.id,});
+    const route = this.apiVersion === 'v1' ? '/items' : '/router';
+    const qs = {action: apiVersion === 'v1' ? '' : 'deleteItem'};
+    fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
+        method: apiVersion === 'v1' ? 'DELETE' : 'POST',
+        body: request,
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }).then(res => res.json())
+        .then((response) => {
+            if (response['ok'] === true) {
+                this.getTasks()
+            } else {
+                alert("An error occurred. Open the developer console to view the details.")
+            }
+        });
+}
+
+function addTask() {
+    console.log('add task')
+}
+function enterCheck(){
+    if (event.key==="Enter"){
+        addTask()
+    }
 }
