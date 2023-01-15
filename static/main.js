@@ -27,7 +27,7 @@ let templates = {
     main: () =>
         '<h3>Add a new task:</h3>\n' +
         '<label style="display: flex;">\n' +
-        '<input onkeyup="enterCheck()" class="new_todo" autofocus autocomplete="on" placeholder="walk the neighbor\'s cat" type="text">\n' +
+        '<input onkeyup="addTask()" id="new_todo" class="new_todo" autofocus autocomplete="on" placeholder="walk the neighbor\'s cat" type="text">\n' +
         '<span><button  onclick="addTask()" class="button new_todo_button">Add</button></span>\n' +
         '</label>\n' +
         `<h3 class="status_title">Active tasks: ${this.tasks.length}</h3>\n`
@@ -130,9 +130,7 @@ function getTasks() {
                 this.tasks = response.items
                 mainPage()
             }
-        }).catch((error) => {
-        this.step = 'error';
-    })
+        })
 }
 
 function updateTask(index, id) {
@@ -273,7 +271,7 @@ function editTask(index, task) {
 
 function deleteTask(index, task) {
     let request = JSON.stringify({id: task.id,});
-    const route = this.apiVersion === 'v1' ? '/items' : '/router';
+    const route = apiVersion === 'v1' ? '/items' : '/router';
     const qs = {action: apiVersion === 'v1' ? '' : 'deleteItem'};
     fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
         method: apiVersion === 'v1' ? 'DELETE' : 'POST',
@@ -293,10 +291,27 @@ function deleteTask(index, task) {
 }
 
 function addTask() {
-    console.log('add task')
-}
-function enterCheck(){
-    if (event.key==="Enter"){
-        addTask()
+    if (event.key === "Enter" || event.type === "click") {
+        const input = document.getElementById('new_todo').value
+        if (input.trim() !== '') {
+            let request = JSON.stringify({text: input});
+            const route = apiVersion === 'v1' ? '/items' : '/router';
+            const qs = {action: apiVersion === 'v1' ? '' : 'createItem'};
+            fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
+                method: apiVersion === 'v1' ? 'POST' : 'POST',
+                body: request,
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            }).then(res => res.json())
+                .then((response) => {
+                    if (response.id) {
+                        getTasks();
+                    } else {
+                        alert("An error occurred. Open the developer console to view the details.")
+                    }
+                });
+        }
     }
 }
