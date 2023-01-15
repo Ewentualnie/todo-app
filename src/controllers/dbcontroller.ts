@@ -9,7 +9,7 @@ export function getTasks(req: Request, res: Response) {
             res.status(200).send(JSON.stringify({items: value})) :
             res.status(404).send(JSON.stringify({error: "can't load tasks"})));
     } else {
-        res.status(404).send(JSON.stringify({error: 'forbidden'}));
+        res.status(403).send(JSON.stringify({error: 'forbidden'}));
     }
 }
 
