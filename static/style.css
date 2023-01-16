@@ -76,6 +76,7 @@ main {
 }
 
 button {
+    font-size: 20px;
     cursor: pointer;
     padding-left: 3px;
     padding-right: 3px;
@@ -118,7 +119,7 @@ button {
     transition: background .1s, color .1s;
 }
 
-.login button:hover, .logout:hover {
+.login button:hover, .logout:hover, #set:hover {
     background-color: rgba(0, 0, 0, .05);
     transition: background .1s, color .1s;
 }
