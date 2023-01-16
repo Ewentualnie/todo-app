@@ -61,7 +61,7 @@ h3 {
 
 main {
     display: flex;
-    height: 826px;
+    min-height: 826px;
     padding-top: 30px;
     justify-content: center;
 }
