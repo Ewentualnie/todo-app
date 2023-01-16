@@ -152,20 +152,27 @@ button {
 }
 
 .edit-input {
-    align-items: center;
-    padding-top: 10px;
-    width: min-content;
+    box-shadow: none;
+}
+
+.edit-buttons {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
 }
 
 .task {
-    display: flex;
-    flex-direction: row;
     margin-bottom: 15px;
     padding: 0 10px;
     width: 398px;
     border-radius: 10px;
     font-weight: 400;
     font-size: 16px;
+}
+
+.taskPresentation {
+    display: flex;
+    align-items: center;
 }
 
 .LoginButton {
