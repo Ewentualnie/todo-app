@@ -167,7 +167,7 @@ function deleteTask(task) {
     const qs = {action: apiVersion === 'v1' ? '' : 'deleteItem'};
     fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
         method: apiVersion === 'v1' ? 'DELETE' : 'POST',
-        body: JSON.stringify({id: task.id,}),
+        body: JSON.stringify(task),
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
@@ -312,11 +312,7 @@ function createDisplayDiv(index, task) {
         createCheckedButton(task),
         createTextField(index, task),
         createEditDeleteButtons(task))
-    task.editable ?
-        presentation.classList.add('hidden') &&
-        presentation.classList.remove('taskPresentation') :
-        presentation.classList.add('taskPresentation') &&
-        presentation.classList.remove('hidden');
+    presentation.style.display = task.editable ? 'none' : 'flex'
     return presentation
 }
 
@@ -403,7 +399,7 @@ function editTask(task) {
 }
 
 function save(task, inputField) {
-    if ((event.key === "Enter" || event.type === "click") && (inputField !== '' || inputField !== ' ')) {
+    if ((event.key === "Enter" || event.type === "click") && inputField.value.trim()) {
         task.text = inputField.value
         task.editable = false
         mainPage()
