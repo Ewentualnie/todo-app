@@ -1,3 +1,12 @@
+const newTag = {
+    div: () => document.createElement('div'),
+    h3: () => document.createElement('h3'),
+    label: () => document.createElement('label'),
+    input: () => document.createElement('input'),
+    span: () => document.createElement('span'),
+    button: () => document.createElement('button'),
+    hr: () => document.createElement('hr')
+}
 let templates = {
     login: () =>
         '<h1>Account access</h1>\n' +
@@ -35,7 +44,6 @@ let templates = {
 
 const wrapper = () => document.getElementById('wrapper')
 const apiURL = 'http://localhost:3005/api/'
-const taskInput = () => document.getElementById('new_todo').value
 let apiVersion = 'v1'
 
 
@@ -197,30 +205,39 @@ function addTask(task) {
 }
 
 function createChild(id, child) {
-    const node = document.createElement("div")
+    const node = newTag.div()
     node.id = id
     node.className = id
     node.innerHTML = child
     return node
 }
 
+// TODO createMainDiv, createLoginDiv, createSettingDiv to templates
 let createLoginDiv = () => createChild('login', templates.login())
 
 let createSettingsDiv = () => createChild('settings', templates.settings())
 
 function createMainDiv() {
-    const main = document.createElement('div')
-    const addNew = document.createElement('h3')
-    const label = document.createElement('label')
-    const input = document.createElement('input')
-    const span = document.createElement('span')
-    const button = document.createElement('button')
-    const activeTasks = document.createElement('h3')
+    const main = newTag.div()
+    const addNew = newTag.h3()
+    const activeTasks = newTag.h3()
 
     main.id = 'main'
     main.className = 'main'
 
     addNew.innerText = 'Add a new task:'
+
+    activeTasks.innerText = `Active tasks: ${this.tasks.length}`
+
+    main.append(addNew, createMainLabel(), activeTasks)
+    return main
+}
+
+function createMainLabel() {
+    const label = newTag.label()
+    const input = newTag.input()
+    const span = newTag.span()
+    const button = newTag.button()
 
     label.style.display = 'flex'
 
@@ -232,26 +249,23 @@ function createMainDiv() {
     button.className = 'new_todo_button'
     button.innerText = 'Add'
 
-    activeTasks.innerText = `Active tasks: ${this.tasks.length}`
-
     span.append(button)
     label.append(input, span)
-    main.append(addNew, label, activeTasks)
-    return main
+    return label
 }
 
 let createTaskDiv = (index, task) => {
-    const taskDiv = document.createElement('div')
-    const inputDiv = createInputDiv(index, task)
+    const taskDiv = newTag.div()
+    const inputDiv = createInputDiv(task)
     const displayDiv = createDisplayDiv(index, task)
     taskDiv.append(displayDiv, inputDiv)
     task.checked ? taskDiv.classList.add('task', 'taskCompleted') : taskDiv.classList.add('task');
     return taskDiv
 }
 
-function createCheckedButton(index, task) {
-    const button = document.createElement('button')
-    const buttonSpan = document.createElement('span')
+function createCheckedButton(task) {
+    const button = newTag.button()
+    const buttonSpan = newTag.span()
 
     !task.checked ? button.classList.add('task_done') : button.classList.add('task_done', 'taskButton');
 
@@ -265,9 +279,9 @@ function createCheckedButton(index, task) {
 }
 
 function createEditDeleteButtons(task) {
-    const buttons = document.createElement('div')
-    const deleteButton = document.createElement('button')
-    const editButton = document.createElement('button')
+    const buttons = newTag.div()
+    const deleteButton = newTag.button()
+    const editButton = newTag.button()
 
     editButton.innerText = '✎️'
     editButton.style.color = '#eca81a'
@@ -284,7 +298,7 @@ function createEditDeleteButtons(task) {
 }
 
 function createTextField(index, task) {
-    const taskText = document.createElement('span')
+    const taskText = newTag.span()
 
     taskText.classList.add('task_content')
     taskText.innerText = `${index + 1}. ${task.text}`
@@ -293,9 +307,9 @@ function createTextField(index, task) {
 }
 
 function createDisplayDiv(index, task) {
-    const presentation = document.createElement('div')
+    const presentation = newTag.div()
     presentation.append(
-        createCheckedButton(index, task),
+        createCheckedButton(task),
         createTextField(index, task),
         createEditDeleteButtons(task))
     task.editable ?
@@ -306,31 +320,28 @@ function createDisplayDiv(index, task) {
     return presentation
 }
 
-function createInputDiv(index, task) {
-    const div = document.createElement('div')
-    const inputField = createInputField(index, task)
+function createInputDiv(task) {
+    const div = newTag.div()
+    const inputField = createInputField(task)
 
-    div.append(inputField, createSaveDiscardButtons(index, task, inputField))
+    div.append(inputField, createSaveDiscardButtons(task, inputField))
 
     div.style.display = task.editable ? 'flex' : 'none'
-    div.id = index
     return div
 }
 
-function createInputField(index, task) {
-    const input = document.createElement('input')
+function createInputField(task) {
+    const input = newTag.input()
     input.classList.add('edit-input')
     input.value = task.text
-    input.placeholder = task.text
-    input.id = index + 'input'
     input.onkeyup = () => save(task, input)
     return input
 }
 
-function createSaveDiscardButtons(index, task, inputField) {
-    const buttonsDiv = document.createElement('div')
-    const saveButton = document.createElement('button')
-    const discardButton = document.createElement("button")
+function createSaveDiscardButtons(task, inputField) {
+    const buttonsDiv = newTag.div()
+    const saveButton = newTag.button()
+    const discardButton = newTag.button()
 
     saveButton.innerText = '💾'
     saveButton.style.fontSize = '16px'
@@ -338,7 +349,7 @@ function createSaveDiscardButtons(index, task, inputField) {
 
     saveButton.onclick = () => save(task, inputField)
     discardButton.onclick = () => {
-        this.tasks[index].editable = false
+        task.editable = false
         mainPage()
     }
     buttonsDiv.append(saveButton, discardButton)
@@ -347,7 +358,7 @@ function createSaveDiscardButtons(index, task, inputField) {
 }
 
 function createLogoutButton() {
-    const button = document.createElement('button')
+    const button = newTag.button()
     button.onclick = () => logout()
     button.className = 'logout'
     button.innerText = 'Log out'
@@ -355,7 +366,7 @@ function createLogoutButton() {
 }
 
 function createSettingsButton() {
-    const button = document.createElement('button')
+    const button = newTag.button()
     button.id = 'set'
     button.onclick = () => settingsPage()
     button.innerText = 'Settings'
@@ -371,17 +382,14 @@ function mainPage() {
     wrapper().childNodes.forEach(value => value.remove())
     const main = createMainDiv()
     this.tasks.forEach((value, index) => main.appendChild(createTaskDiv(index, value)))
-    const hr = document.createElement('hr')
-    main.append(hr, createLogoutButton(), createSettingsButton())
+    main.append(newTag.hr(), createLogoutButton(), createSettingsButton())
     wrapper().appendChild(main)
 }
 
 function settingsPage() {
     wrapper().childNodes.forEach(value => value.remove())
     wrapper().appendChild(createSettingsDiv())
-    apiVersion === 'v1' ?
-        document.getElementById('v1').classList.add('selected') :
-        document.getElementById('v2').classList.add('selected');
+    document.getElementById(apiVersion === 'v1' ? 'v1' : 'v2').classList.add('selected')
 }
 
 function markTask(task) {
