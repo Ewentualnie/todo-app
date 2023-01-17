@@ -68,11 +68,15 @@ main {
 
 .task_content {
     width: 400px;
+    display: flex;
+    align-items: center;
 }
 
 .taskCompleted .task_content {
+    display: flex;
     color: #83e5fa;
     text-decoration: line-through;
+    align-items: center;
 }
 
 button {
@@ -119,7 +123,7 @@ button {
     transition: background .1s, color .1s;
 }
 
-.login button:hover, .logout:hover, #set:hover {
+.login button:hover, .logout:hover, #set:hover, .new_todo_button:hover {
     background-color: rgba(0, 0, 0, .05);
     transition: background .1s, color .1s;
 }
@@ -168,11 +172,6 @@ button {
     border-radius: 10px;
     font-weight: 400;
     font-size: 16px;
-}
-
-.taskPresentation {
-    display: flex;
-    align-items: center;
 }
 
 .LoginButton {
