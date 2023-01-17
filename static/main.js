@@ -7,7 +7,7 @@ const newTag = {
     button: () => document.createElement('button'),
     hr: () => document.createElement('hr')
 }
-let templates = {
+const templates = {
     login: () =>
         '<h1>Account access</h1>\n' +
         '<div class="LoginInput">\n' +
@@ -20,8 +20,8 @@ let templates = {
         '</div>\n' +
         '<div class="LoginButton">\n' +
         '<div>\n' +
-        '<button id="reg" onclick="registration()">Registration</button>\n' +
-        '<button id="log" onclick="login()">Sign in</button>\n' +
+        '<button onclick="registration()">Registration</button>\n' +
+        '<button onclick="login()">Sign in</button>\n' +
         '</div>\n' +
         '<button id="set" onclick="settingsPage()">Settings</button>\n' +
         '</div>',
@@ -32,14 +32,7 @@ let templates = {
         '<button id="v1" onclick="setApiVersion(this)">v1</button>\n' +
         '<button id="v2" onclick="setApiVersion(this)">v2</button>\n' +
         '</div>\n' +
-        '<button id="back" onclick="getTasks()">Back</button>',
-    main: () =>
-        '<h3>Add a new task:</h3>\n' +
-        '<label style="display: flex;">\n' +
-        '<input onkeyup="addTask(this)" id="new_todo" class="new_todo" autofocus autocomplete="on" placeholder="walk the neighbor\'s cat" type="text">\n' +
-        '<span><button  onclick="addTask()" class="button new_todo_button">Add</button></span>\n' +
-        '</label>\n' +
-        `<h3 class="status_title">Active tasks: ${this.tasks.length}</h3>\n`
+        '<button id="back" onclick="getTasks()">Back</button>'
 }
 
 const wrapper = () => document.getElementById('wrapper')
@@ -90,7 +83,7 @@ function login() {
         const route = apiVersion === 'v1' ? '/login' : '/router';
         const qs = {action: apiVersion === 'v1' ? '' : 'login'};
         fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
-            method: this.apiVersion === 'v1' ? 'POST' : 'POST',
+            method: apiVersion === 'v1' ? 'POST' : 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
@@ -158,7 +151,7 @@ function updateTask(task) {
     })
         .then(res => res.json())
         .then(() => {
-            this.getTasks()
+            getTasks()
         });
 }
 
@@ -183,7 +176,7 @@ function deleteTask(task) {
 }
 
 function addTask(task) {
-    if ((event.key === "Enter" || event.type === "click") && task.value.trim() !== '') {
+    if (task.value.trim() !== '') {
         const route = apiVersion === 'v1' ? '/items' : '/router';
         const qs = {action: apiVersion === 'v1' ? '' : 'createItem'};
         fetch(apiURL + apiVersion + route + '?' + new URLSearchParams(qs), {
@@ -212,7 +205,6 @@ function createChild(id, child) {
     return node
 }
 
-// TODO createMainDiv, createLoginDiv, createSettingDiv to templates
 let createLoginDiv = () => createChild('login', templates.login())
 
 let createSettingsDiv = () => createChild('settings', templates.settings())
@@ -221,6 +213,7 @@ function createMainDiv() {
     const main = newTag.div()
     const addNew = newTag.h3()
     const activeTasks = newTag.h3()
+    const hr = newTag.hr()
 
     main.id = 'main'
     main.className = 'main'
@@ -229,7 +222,7 @@ function createMainDiv() {
 
     activeTasks.innerText = `Active tasks: ${this.tasks.length}`
 
-    main.append(addNew, createMainLabel(), activeTasks)
+    main.append(addNew, createMainLabel(), hr, activeTasks)
     return main
 }
 
@@ -243,7 +236,9 @@ function createMainLabel() {
 
     input.className = 'new_todo'
     input.placeholder = "walk the neighbor's cat"
-    input.onkeyup = () => addTask(input)
+    input.onkeyup = (ev) => {
+        if (ev.key === 'Enter') addTask(input)
+    }
 
     button.onclick = () => addTask(input)
     button.className = 'new_todo_button'
@@ -330,7 +325,9 @@ function createInputField(task) {
     const input = newTag.input()
     input.classList.add('edit-input')
     input.value = task.text
-    input.onkeyup = () => save(task, input)
+    input.onkeyup = (ev) => {
+        if (ev.key === 'Enter') save(task, input)
+    }
     return input
 }
 
@@ -399,10 +396,9 @@ function editTask(task) {
 }
 
 function save(task, inputField) {
-    if ((event.key === "Enter" || event.type === "click") && inputField.value.trim()) {
+    if (inputField.value.trim()) {
         task.text = inputField.value
         task.editable = false
-        mainPage()
         updateTask(task);
     }
 }
