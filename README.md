@@ -20,7 +20,7 @@ Environment variables include:
 
 - `MONGO_USER` (Username of user that can access database)
 - `MONGO_PASS` (Password of user that can access database)
-- `DATABASE` (Database name)
+- `DATABASE` (Database name, *MUST* be same like container_name in docker-compose.yml)
 
 ---
 
