@@ -1,4 +1,4 @@
-const newTag = {
+const tag = {
     div: () => document.createElement('div'),
     h3: () => document.createElement('h3'),
     label: () => document.createElement('label'),
@@ -67,7 +67,7 @@ function registration() {
                 if (response.ok) {
                     login();
                 } else {
-                    alert("An error occurred. Open the developer console to view the details.")
+                    errorPage("An error occurred. Open the developer console to view the details.")
                 }
             });
     }
@@ -95,9 +95,9 @@ function login() {
                     localStorage.setItem('name', input.login);
                     getTasks();
                 } else if (response.error === 'not found') {
-                    alert('This combination of login and password was not found');
+                    errorPage('This combination of login and password was not found')
                 } else {
-                    alert("An error occurred. Open the developer console to view the details.")
+                    errorPage("An error occurred. Open the developer console to view the details.")
                 }
             })
     }
@@ -170,7 +170,7 @@ function deleteTask(task) {
             if (response['ok']) {
                 getTasks()
             } else {
-                alert("An error occurred. Open the developer console to view the details.")
+                errorPage("An error occurred. Open the developer console to view the details.")
             }
         });
 }
@@ -191,14 +191,14 @@ function addTask(task) {
                 if (response.id) {
                     getTasks();
                 } else {
-                    alert("An error occurred. Open the developer console to view the details.")
+                    errorPage("An error occurred. Open the developer console to view the details.")
                 }
             });
     }
 }
 
 function createChild(id, child) {
-    const node = newTag.div()
+    const node = tag.div()
     node.id = id
     node.className = id
     node.innerHTML = child
@@ -210,10 +210,10 @@ let createLoginDiv = () => createChild('login', templates.login())
 let createSettingsDiv = () => createChild('settings', templates.settings())
 
 function createMainDiv() {
-    const main = newTag.div()
-    const addNew = newTag.h3()
-    const activeTasks = newTag.h3()
-    const hr = newTag.hr()
+    const main = tag.div()
+    const addNew = tag.h3()
+    const activeTasks = tag.h3()
+    const hr = tag.hr()
 
     main.id = 'main'
     main.className = 'main'
@@ -227,10 +227,10 @@ function createMainDiv() {
 }
 
 function createMainLabel() {
-    const label = newTag.label()
-    const input = newTag.input()
-    const span = newTag.span()
-    const button = newTag.button()
+    const label = tag.label()
+    const input = tag.input()
+    const span = tag.span()
+    const button = tag.button()
 
     label.style.display = 'flex'
 
@@ -250,7 +250,7 @@ function createMainLabel() {
 }
 
 let createTaskDiv = (index, task) => {
-    const taskDiv = newTag.div()
+    const taskDiv = tag.div()
     const inputDiv = createInputDiv(task)
     const displayDiv = createDisplayDiv(index, task)
     taskDiv.append(displayDiv, inputDiv)
@@ -259,8 +259,8 @@ let createTaskDiv = (index, task) => {
 }
 
 function createCheckedButton(task) {
-    const button = newTag.button()
-    const buttonSpan = newTag.span()
+    const button = tag.button()
+    const buttonSpan = tag.span()
 
     !task.checked ? button.classList.add('task_done') : button.classList.add('task_done', 'taskButton');
 
@@ -274,9 +274,9 @@ function createCheckedButton(task) {
 }
 
 function createEditDeleteButtons(task) {
-    const buttons = newTag.div()
-    const deleteButton = newTag.button()
-    const editButton = newTag.button()
+    const buttons = tag.div()
+    const deleteButton = tag.button()
+    const editButton = tag.button()
 
     editButton.innerText = '✎️'
     editButton.style.color = '#eca81a'
@@ -293,7 +293,7 @@ function createEditDeleteButtons(task) {
 }
 
 function createTextField(index, task) {
-    const taskText = newTag.span()
+    const taskText = tag.span()
 
     taskText.classList.add('task_content')
     taskText.innerText = `${index + 1}. ${task.text}`
@@ -302,7 +302,7 @@ function createTextField(index, task) {
 }
 
 function createDisplayDiv(index, task) {
-    const presentation = newTag.div()
+    const presentation = tag.div()
     presentation.append(
         createCheckedButton(task),
         createTextField(index, task),
@@ -312,7 +312,7 @@ function createDisplayDiv(index, task) {
 }
 
 function createInputDiv(task) {
-    const div = newTag.div()
+    const div = tag.div()
     const inputField = createInputField(task)
 
     div.append(inputField, createSaveDiscardButtons(task, inputField))
@@ -322,7 +322,7 @@ function createInputDiv(task) {
 }
 
 function createInputField(task) {
-    const input = newTag.input()
+    const input = tag.input()
     input.classList.add('edit-input')
     input.value = task.text
     input.onkeyup = (ev) => {
@@ -332,9 +332,9 @@ function createInputField(task) {
 }
 
 function createSaveDiscardButtons(task, inputField) {
-    const buttonsDiv = newTag.div()
-    const saveButton = newTag.button()
-    const discardButton = newTag.button()
+    const buttonsDiv = tag.div()
+    const saveButton = tag.button()
+    const discardButton = tag.button()
 
     saveButton.innerText = '💾'
     saveButton.style.fontSize = '16px'
@@ -351,7 +351,7 @@ function createSaveDiscardButtons(task, inputField) {
 }
 
 function createLogoutButton() {
-    const button = newTag.button()
+    const button = tag.button()
     button.onclick = () => logout()
     button.className = 'logout'
     button.innerText = 'Log out'
@@ -359,7 +359,7 @@ function createLogoutButton() {
 }
 
 function createSettingsButton() {
-    const button = newTag.button()
+    const button = tag.button()
     button.id = 'set'
     button.onclick = () => settingsPage()
     button.innerText = 'Settings'
@@ -375,7 +375,7 @@ function mainPage() {
     wrapper().childNodes.forEach(value => value.remove())
     const main = createMainDiv()
     this.tasks.forEach((value, index) => main.appendChild(createTaskDiv(index, value)))
-    main.append(newTag.hr(), createLogoutButton(), createSettingsButton())
+    main.append(tag.hr(), createLogoutButton(), createSettingsButton())
     wrapper().appendChild(main)
 }
 
@@ -384,7 +384,31 @@ function settingsPage() {
     wrapper().appendChild(createSettingsDiv())
     document.getElementById(apiVersion === 'v1' ? 'v1' : 'v2').classList.add('selected')
 }
+function errorPage(message) {
+    const screen = tag.div()
+    const main = tag.div()
+    const messageDiv = tag.div()
+    screen.id = 'error'
+    screen.style.width = `${document.documentElement.clientWidth}px`
+    screen.style.height = `${document.documentElement.scrollHeight}px`
 
+    main.className = 'errorBox'
+
+    messageDiv.innerText = message
+    messageDiv.className = 'errorMessage'
+
+    main.append(messageDiv, createBackButton(screen))
+    screen.append(main)
+    document.documentElement.append(screen)
+    setTimeout(() => screen.remove(), 3000);
+}
+function createBackButton(div) {
+    const backButton = tag.button()
+    backButton.onclick = () => div.remove()
+    backButton.innerText = 'Back'
+    backButton.className = 'back'
+    return backButton
+}
 function markTask(task) {
     task.checked = !task.checked
     updateTask(task)
