@@ -1,7 +1,7 @@
 import {MongoClient, ObjectId, UpdateResult} from "mongodb";
 import {Task, User} from "./utils/types";
 
-const client = new MongoClient("mongodb://root:root@localhost:27017");
+const client = new MongoClient(`mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.DATABASE}:27017`);
 const users = client.db("mongoDb").collection("users");
 
 export function load(userId: ObjectId): Promise<Array<Task> | undefined> {
@@ -48,4 +48,6 @@ export function getUser(user: User): Promise<User | null> {
         .then(() => users.findOne<User>({login: user.login}));
 }
 
-client.connect().then(() => client.close().then(() => console.log("Connection to mongoDb is successful")));
+client.connect().then(() =>
+    console.log(`Connection to "${process.env.DATABASE}", like user: "${process.env.MONGO_USER}" with pass: "${process.env.MONGO_PASS}" is successful`)
+);
